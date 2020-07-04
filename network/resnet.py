@@ -36,7 +36,7 @@ class Resnet(nn.Module):
         # resnet内部已初始化
         self.avgpool = resnet.avgpool
         # self.fc1 = nn.Linear(512, 5)
-        self.fc1 = nn.Linear(512, 5)
+        self.fc1 = nn.Linear(512, cfg.NUM_CATEGORY)
         # TODO：做一个固定参数的功能
         self._freeze_backbone(cfg.FREEZE_CONV_BODY_AT)
         nn.init.kaiming_uniform_(self.fc1.weight, a=1)

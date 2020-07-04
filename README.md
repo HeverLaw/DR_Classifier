@@ -26,19 +26,23 @@ pip install yacs
 
 ## 保存模型的文件
 
-模型文件存放路径如字典所示，使用哪个模型由配置文件中BACKBONE决定，默认使用resnet34
+模型文件存放路径如字典所示，使用哪个模型由模型名称决定，dr为糖网（使用resnet34），cataract为白内障（使用resnet34_cataract）。
 
 ```
+# 配置模型路径
 model_path = {
     'resnet34': './models/resnet34.pth',
+    'resnet34_cataract': './models/resnet34_cataract.pth'
 }
+# 配置模型名称，dr为糖网，cataract为白内障
+model_name = 'cataract'
 ```
 
 ## 模型性能说明
 
-单张图像的处理时间（含IO和数据预处理）：gpu（RTX-2080）约0.04s/张，cpu（i7-8700）约0.22s/张
+### 糖网Resnet34模型性能（验证集）
 
-### Resnet34模型性能（验证集）
+单张图像的处理时间（含IO和数据预处理）：gpu（RTX-2080）约0.04s/张，cpu（i7-8700）约0.22s/张
 
 |           | level1 | level2 | level3 | level4 | level5 |
 | --------- | ------ | ------ | ------ | ------ | ------ |
@@ -52,6 +56,22 @@ ROC-AUC
 | ---- | ------ | ------ | ------ | ------ | ------ | --------- | --------- |
 | AUC  | 0.8911 | 0.7244 | 0.9012 | 0.9721 | 0.9843 | 0.9658    | 0.8950    |
 
+### 白内障Resnet模型性能（验证集）
+
+单张图像的处理时间（含IO和数据预处理）：gpu（RTX-2080）约0.15s/张，cpu（i7-8700）约0.28s/张
+
+|           | 正常  | 白内障 | 青光眼 | 视网膜疾病 |
+| --------- | ----- | ------ | ------ | ---------- |
+| 准确率(%) | 83.33 | 75.00  | 80.00  | 80.00      |
+
+平均准确率：80.83%
+
+ROC-AUC
+
+|      | 正常   | 白内障 | 青光眼 | 视网膜疾病 | 微平均AUC | 宏平均AUC |
+| ---- | ------ | ------ | ------ | ---------- | --------- | --------- |
+| AUC  | 0.8619 | 0.9385 | 0.9235 | 0.9675     | 0.9274    | 0.9278    |
+
 ## 模型使用说明
 
 参考./demo.py
@@ -60,7 +80,10 @@ ROC-AUC
 # 配置模型路径
 model_path = {
     'resnet34': './models/resnet34.pth',
+    'resnet34_cataract': './models/resnet34_cataract.pth'
 }
+# 配置模型名称，dr为糖网，cataract为白内障
+model_name = 'cataract'
 
 
 if __name__ == '__main__':
@@ -84,7 +107,6 @@ if __name__ == '__main__':
     # 再转化为PIL.Image.Image对象
     img = base64_to_image(base64_image)
 
-    import time
     # 方式一：直接传入PIL.Image.Image对象
     prediction, score = model.run_image(img=img)
     # 输出分类结果，注意分类的index是[0,5)，因此需要加1
@@ -94,6 +116,11 @@ if __name__ == '__main__':
     prediction, score = model.run_image(path=os.path.join(image_dir, image_lists[1]))
     # 输出分类结果，注意分类的index是[0,5)，因此需要加1
     print('预测分类为：', prediction + 1, '分类得分为：',  score)
+    
+    # 白内障测试，(prediction+1)分类代表：1：正常，2：白内障，3：青光眼，4：视网膜疾病
+    prediction, score = model.run_image(path=os.path.join(image_dir, image_lists[2]))
+    # 输出分类结果，注意分类的index是[0,4)，因此需要加1
+    print('预测分类为：', prediction + 1, '分类得分为：', score)
 ```
 
 ## 图像预处理
