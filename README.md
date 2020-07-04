@@ -26,7 +26,7 @@ pip install yacs
 
 ## 保存模型的文件
 
-模型文件存放路径如字典所示，使用哪个模型由模型名称决定，dr为糖网（使用resnet34），cataract为白内障（使用resnet34_cataract）。
+模型文件存放路径如字典所示，使用哪个模型由模型名称model_name决定，dr为糖网（使用resnet34），cataract为白内障（使用resnet34_cataract）。
 
 ```
 # 配置模型路径
